@@ -13,12 +13,9 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 def save_output(arr, filename):
     with open(filename, 'w') as file:
-        # Redirect the standard output to the file
         sys.stdout = file
 
-        # Print the tabulated array to the file
         print(tabulate(arr, numalign="center"))
-
     sys.stdout = sys.__stdout__ 
 
 def lab_encoder(y):
@@ -28,12 +25,12 @@ def lab_encoder(y):
 
 def main():
 	#read the data
-    default_col_labels = [f"F{i}" for i in range(0, 32)]  # Adjust num_columns
+    default_col_labels = [f"F{i}" for i in range(0, 32)]
 
     data = pd.read_csv("data.csv", header=None, names=default_col_labels)
     data.rename(columns={default_col_labels[0]: "id", default_col_labels[1]: "diagnosis"}, inplace=True)
 
-    #training using NeuralNetwork
+    #training
     n_input = 30  # Number of input features
     n_hlayers = [64, 32]  # Number of neurons in each hidden layer
     n_output = 1  # Number of output neurons (for binary classification)

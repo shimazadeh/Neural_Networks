@@ -8,7 +8,6 @@ class NeuralNetwork():
         self.n_input = n_input
         self.n_hlayers = n_hlayers
         self.n_output = n_output
-
         self.weight, self.biases = self.initialize_parameter()
 
     def initialize_parameter(self): #will initialize weight and biases to random numbers
@@ -47,7 +46,6 @@ class NeuralNetwork():
             gradient[i] = np.dot(delta, activation[i].T)
             delta = np.dot(self.weight[i].T, delta)
             delta *= (activation[i] > 0)
-
         return gradient
 
     def loss(self, predicted, target):
@@ -62,16 +60,16 @@ class NeuralNetwork():
     def train(self, x_train,  y_train, epochs, learning_rate):
         for epoch in range(epochs):
             total_loss = 0
-
+            
             #iterate over each training example
             for x, y in zip(x_train, y_train):
                 x = x.reshape(-1, 1)
                 y = y.reshape(-1, 1)
-
+                
                 activation = self._forward_propagation(x)
                 total_loss += self.loss(activation[-1], y)
                 gradients = self._backward_propagation(x, y, activation)
-
+               
                 for i in range(len(self.weight)):
                     self.weight[i] -= learning_rate * gradients[i]
             avg_loss = total_loss / len(x_train)

@@ -6,6 +6,7 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
 EPSILON = 1e-10
+np.random.seed(42) 
 
 class NeuralNetwork():
     def __init__(self, n_input, n_hlayers, n_output):
@@ -26,10 +27,9 @@ class NeuralNetwork():
         weight = []
         bias = []
         n_neurons = [self.n_input] + self.n_hlayers + [self.n_output]
-        print("number of neurons", n_neurons)
         for i in range(1, len(n_neurons)):
             weight_matrix = np.random.randn(n_neurons[i], n_neurons[i - 1]) * np.sqrt(2 / n_neurons[i - 1])
-            bias_matrix = np.zeros((n_neurons[i], 1))
+            bias_matrix = 0.001 * np.ones((n_neurons[i], 1))
             weight.append(weight_matrix)
             bias.append(bias_matrix)
 
@@ -42,7 +42,7 @@ class NeuralNetwork():
         return (np.maximum(0, x))
 
     def _forward_propagation(self, x):#going through each layer and calculating each layer activation value : weight * x + bias
-        activation = [x]
+        activation = [self.sigmoid(x)]
         for i in range(len(self.weight)):
             z = np.dot(self.weight[i], activation[i]) + self.biases[i]
             a = self.relu(z)
@@ -60,13 +60,27 @@ class NeuralNetwork():
         return gradient
 
     def loss(self, predicted, target):
-        log = 0
         if (len(predicted) != len(target)):
             raise ValueError("length missmatch: loss method")
+        
+        log = 0
         for i in range(len(predicted)):
-            log += math.log(predicted[i] + EPSILON) * target[i]
+            temp = max(min(predicted[i], 1 - EPSILON), EPSILON)
+            log += -target[i] * math.log(temp) - ((1 - target[i]) * math.log(1- temp))
+            
+        #L1 regularization
+        L1_regularization = 0
+        for layer_weights in self.weight:
+            L1_regularization += np.sum(np.abs(layer_weights))
+        
+        #L2 regularization
+        L2_regularization = 0
+        for layer_weights in self.weight:
+            L2_regularization += np.sum((layer_weights)**2)
 
-        return (-log)
+        regularized_log = (log) + 0.001 * L2_regularization
+        # print(L1_regularization, L2_regularization, log)
+        return (log)
 
     def train(self, x_train,  y_train, x_val, y_val, _epochs, _learning_rate, threshold):
         self.learning_rate = _learning_rate
@@ -113,7 +127,9 @@ class NeuralNetwork():
         
         self._plot(self.losses, self.validation_losses, "Loss", "Loss_figure.png")
         self._plot(self.accuracies, self.validation_accuracies, "Accuracies", "Learning_curve.png")
-
+    
+        return self.accuracies[-1], self.validation_accuracies[-1]
+    
     def predict(self, x_test, threshold):
         probabilities = []
         for x in x_test:

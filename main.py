@@ -32,7 +32,7 @@ def training(layers, epochs, learning_rate, l1=0, l2=0):
         default_col_labels.append(f"F{i}")
     data = pd.read_csv("./Data/data.csv", header=None, names=default_col_labels)
 
-    #cleanup the dataset
+    #cleanup/scale the dataset
     y = lab_encoder(data["diagnosis"])
     x = data.iloc[:,2:]
     min_max_scaler = MinMaxScaler()
@@ -46,10 +46,8 @@ def training(layers, epochs, learning_rate, l1=0, l2=0):
     n_input = 30
     n_output = 1  
     threshold = 0.5
-
     neural_net = NeuralNetwork(n_input, layers, n_output, l1, l2)
     accuracy, val_acc = neural_net.train(x_train, y_train, x_val, y_val, int(epochs), learning_rate, threshold)
-    #use cross validation to pick the threshold better? 
 
     # Make predictions
     predictions = neural_net.predict(x_test, threshold)

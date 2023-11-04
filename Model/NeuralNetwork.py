@@ -127,7 +127,7 @@ class NeuralNetwork():
             self.validation_losses.append(avg_val_loss)
             self.validation_accuracies.append(val_accuracy)
         
-            # print(f"Epoch {_e+1}/{_e}, Loss: {avg_loss}, accuracy: {accuracy}, val_loss: {avg_val_loss}, val_acc: {val_accuracy}")
+            print(f"Epoch {_e+1}/{_e}, Loss: {avg_loss}, accuracy: {accuracy}, val_loss: {avg_val_loss}, val_acc: {val_accuracy}")
         
         self._plot(self.losses, self.validation_losses, "Loss", "Loss_figure.png")
         self._plot(self.accuracies, self.validation_accuracies, "Accuracies", "Learning_curve.png")

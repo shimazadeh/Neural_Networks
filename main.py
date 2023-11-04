@@ -8,7 +8,7 @@ from tabulate import tabulate
 from scipy.stats import skew, kurtosis
 import seaborn as sns
 import sys
-from NeuralNetwork import NeuralNetwork
+from Model.NeuralNetwork import NeuralNetwork
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import optuna
 import argparse
@@ -30,7 +30,7 @@ def training(layers, epochs, learning_rate, l1=0, l2=0):
     default_col_labels = ["id", "diagnosis"]
     for i in range(1, 31):
         default_col_labels.append(f"F{i}")
-    data = pd.read_csv("data.csv", header=None, names=default_col_labels)
+    data = pd.read_csv("./Data/data.csv", header=None, names=default_col_labels)
 
     #cleanup the dataset
     y = lab_encoder(data["diagnosis"])

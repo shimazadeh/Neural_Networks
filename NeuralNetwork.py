@@ -9,11 +9,13 @@ EPSILON = 1e-10
 np.random.seed(42) 
 
 class NeuralNetwork():
-    def __init__(self, n_input, n_hlayers, n_output):
+    def __init__(self, n_input, n_hlayers, n_output, _l1, _l2):
         self.n_input = n_input
         self.n_hlayers = n_hlayers
         self.n_output = n_output
 
+        self.l1 = _l1
+        self.l2 = _l2
         self.losses = []
         self.accuracies = []
         self.validation_losses = []
@@ -41,7 +43,7 @@ class NeuralNetwork():
     def relu(self, x):
         return (np.maximum(0, x))
 
-    def _forward_propagation(self, x):#going through each layer and calculating each layer activation value : weight * x + bias
+    def _forward_propagation(self, x):
         activation = [self.sigmoid(x)]
         for i in range(len(self.weight)):
             z = np.dot(self.weight[i], activation[i]) + self.biases[i]
@@ -72,15 +74,17 @@ class NeuralNetwork():
         L1_regularization = 0
         for layer_weights in self.weight:
             L1_regularization += np.sum(np.abs(layer_weights))
+        L1_regularization = self.l1 * L1_regularization
         
         #L2 regularization
         L2_regularization = 0
         for layer_weights in self.weight:
             L2_regularization += np.sum((layer_weights)**2)
+        L2_regularization = self.l2 * L2_regularization
 
-        regularized_log = (log) + 0.001 * L2_regularization
+        regularized_log = (log) + L2_regularization + L1_regularization
         # print(L1_regularization, L2_regularization, log)
-        return (log)
+        return (regularized_log)
 
     def train(self, x_train,  y_train, x_val, y_val, _epochs, _learning_rate, threshold):
         self.learning_rate = _learning_rate
@@ -123,12 +127,12 @@ class NeuralNetwork():
             self.validation_losses.append(avg_val_loss)
             self.validation_accuracies.append(val_accuracy)
         
-            print(f"Epoch {_e+1}/{_e}, Loss: {avg_loss}, accuracy: {accuracy}, val_loss: {avg_val_loss}, val_acc: {val_accuracy}")
+            # print(f"Epoch {_e+1}/{_e}, Loss: {avg_loss}, accuracy: {accuracy}, val_loss: {avg_val_loss}, val_acc: {val_accuracy}")
         
         self._plot(self.losses, self.validation_losses, "Loss", "Loss_figure.png")
         self._plot(self.accuracies, self.validation_accuracies, "Accuracies", "Learning_curve.png")
     
-        return self.accuracies[-1], self.validation_accuracies[-1]
+        return self.accuracies, self.validation_accuracies
     
     def predict(self, x_test, threshold):
         probabilities = []
